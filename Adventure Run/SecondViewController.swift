@@ -292,6 +292,10 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
             
             presentViewController(congratsAlert, animated: true, completion: nil)
             
+            //print(runhistories)
+            
+            testCoreData()
+            
             //save time
             //reset
         }else if reachedStop() {
@@ -308,6 +312,25 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
             }))
             
             presentViewController(notThereYetAlert, animated: true, completion: nil)
+        }
+    }
+    
+    func testCoreData() {
+        let appDelegate =
+            UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        let managedContext = appDelegate.managedObjectContext
+        
+        //2
+        let fetchRequest = NSFetchRequest(entityName: "RunHistory")
+        
+        //3
+        do {
+            let results =
+                try managedContext.executeFetchRequest(fetchRequest)
+            runhistories = results as! [NSManagedObject]
+        } catch let error as NSError {
+            print("Could not fetch \(error), \(error.userInfo)")
         }
     }
     

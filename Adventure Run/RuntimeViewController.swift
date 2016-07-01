@@ -7,16 +7,18 @@
 //
 
 import UIKit
-
+import CoreData
+/*
 struct Variables {
     static var runtimes = [Runtime(runtime: "", date: ""), Runtime(runtime: "RUNTIMES:", date: "")]
-}
+}*/
 
 class RuntimeViewController: UITableViewController {
     
     
     var testing = [Int]()
     var const = 0
+    var runhistories = [NSManagedObject]()
     
     
     
@@ -32,13 +34,36 @@ class RuntimeViewController: UITableViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-       /* self.tableView.beginUpdates()
-        self.tableView.insertRowsAtIndexPaths([
-            // - 2 or 1?
-            NSIndexPath(forRow: Variables.runtimes.count-1, inSection: 0)
-            ], withRowAnimation: .Automatic)
-        self.tableView.endUpdates()*/
-        self.tableView.reloadData()
+       
+        
+        //1
+        let appDelegate =
+            UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        let managedContext = appDelegate.managedObjectContext
+        
+        //2
+        let fetchRequest = NSFetchRequest(entityName: "RunHistory")
+        
+        //3
+        do {
+            let results =
+                try managedContext.executeFetchRequest(fetchRequest)
+            runhistories = results as! [NSManagedObject]
+        } catch let error as NSError {
+            print("Could not fetch \(error), \(error.userInfo)")
+        }
+        
+        print("count \(runhistories.count)")
+        
+         self.tableView.beginUpdates()
+         self.tableView.insertRowsAtIndexPaths([
+         // - 2 or 1?
+         NSIndexPath(forRow: runhistories.count-1, inSection: 0)
+         ], withRowAnimation: .Automatic)
+         self.tableView.endUpdates()
+
+        //self.tableView.reloadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -46,18 +71,18 @@ class RuntimeViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Variables.runtimes.count
+        return runhistories.count
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
         
         
-        var runtime : Runtime
+        var runhistory : NSManagedObject
         
-        runtime = Variables.runtimes[indexPath.row]
+        runhistory =  runhistories[indexPath.row]
         
-        cell.textLabel?.text = runtime.runtime
+        cell.textLabel?.text = runhistory.valueForKey("runtime") as? String
         
         return cell
     }
