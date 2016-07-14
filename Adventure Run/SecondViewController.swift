@@ -16,6 +16,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
     
     
     let locationManager = CLLocationManager()
+    
     @IBOutlet var stopsLeftText: UITextView!
     
     @IBOutlet var timeLeftText: UITextView!
@@ -46,6 +47,8 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
     
     var people = [NSManagedObject]()
     var runhistories = [NSManagedObject]()
+    
+    var distanceTravelled = 0.0;
     
     
     override func viewDidLoad() {
@@ -189,7 +192,16 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
          let directions: MKDirections = MKDirections(request: directionRequest)
          //directions.calculateDirectionsWithCompletionHandler(<#T##completionHandler: MKDirectionsHandler##MKDirectionsHandler##(MKDirectionsResponse?, NSError?) -> Void#>)
          */
+        
+        let pinLocationDist = CLLocation(latitude: xCoordinates[stopNum], longitude: yCoordinates[stopNum])
+        
         let pinLocation = CLLocationCoordinate2DMake(xCoordinates[stopNum], yCoordinates[stopNum])
+        
+        var prevPinLocationDist: CLLocation;
+        if(stopNum > 0) {
+            prevPinLocationDist = CLLocation(latitude: xCoordinates[stopNum-1], longitude: yCoordinates[stopNum-1])
+            distanceTravelled += prevPinLocationDist.distanceFromLocation(pinLocationDist)
+        }
         
         dropPin.coordinate = pinLocation
         dropPin.title = "Stop \(stopNum + 1)"
@@ -242,17 +254,10 @@ class SecondViewController: UIViewController, MKMapViewDelegate, CLLocationManag
             stopsLeftText.text = "Stops Left: \(5-stopNumber)"
             self.Timer.invalidate()
             
-            //give average mile time!
             
-            var lengthRun = 0.0
-            
-            for i in 0...3 {
-                lengthRun += sqrt(pow((xCoordinates[i+1] - xCoordinates[i]), 2) + pow((yCoordinates[i+1] - yCoordinates[i]), 2))
-            }
-            
-            lengthRun *= 60
             let countMileTime = Double(Counter)
-            let avgMileTime = (countMileTime/60.0)/lengthRun
+            
+            let avgMileTime = (countMileTime/60.0)/(distanceTravelled/1609)
             
             let congratsAlert = UIAlertController(title: "Congratulations!", message: "Your average mile time was \(String(format:"%.02f", avgMileTime)) minutes.", preferredStyle: UIAlertControllerStyle.Alert)
             
