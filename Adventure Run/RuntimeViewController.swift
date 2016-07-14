@@ -19,6 +19,7 @@ class RuntimeViewController: UITableViewController {
     var testing = [Int]()
     var const = 0
     var runhistories = [NSManagedObject]()
+    var count = 0
     
     
     
@@ -29,6 +30,7 @@ class RuntimeViewController: UITableViewController {
         //print(Variables.runtimes)
         print(testing)
         print(const)
+        count = runhistories.count
         
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
@@ -53,15 +55,19 @@ class RuntimeViewController: UITableViewController {
         } catch let error as NSError {
             print("Could not fetch \(error), \(error.userInfo)")
         }
+        if(runhistories.count != count) {
+            self.tableView.beginUpdates()
+            self.tableView.insertRowsAtIndexPaths([
+                // - 2 or 1?
+                NSIndexPath(forRow: runhistories.count-1, inSection: 0)
+                ], withRowAnimation: .Automatic)
+            self.tableView.endUpdates()
+            count = runhistories.count
+        }
         
         print("count \(runhistories.count)")
         
-         self.tableView.beginUpdates()
-         self.tableView.insertRowsAtIndexPaths([
-         // - 2 or 1?
-         NSIndexPath(forRow: runhistories.count-1, inSection: 0)
-         ], withRowAnimation: .Automatic)
-         self.tableView.endUpdates()
+        
 
         //self.tableView.reloadData()
     }
